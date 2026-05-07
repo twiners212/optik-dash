@@ -14,7 +14,7 @@ OptiDash adalah aplikasi manajemen toko optik modern yang mencakup fitur POS (Po
 1. **Clone repositori**
    ```bash
    git clone <url-repo-anda>
-   cd optik-66
+   cd optik-dash
    ```
 
 2. **Install dependensi**
