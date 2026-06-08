@@ -61,7 +61,6 @@ export default function InventoryPage() {
 
   /* ── fetch ── */
   const fetchItems = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetch("/api/inventory");
       const data = await res.json();
@@ -122,6 +121,7 @@ export default function InventoryPage() {
       }
 
       setDialogOpen(false);
+      setLoading(true);
       fetchItems();
     } catch {
       setFormError("Terjadi kesalahan jaringan.");
@@ -175,6 +175,7 @@ export default function InventoryPage() {
 
       setEditDialogOpen(false);
       setEditingItem(null);
+      setLoading(true);
       fetchItems();
     } catch {
       setEditError("Terjadi kesalahan jaringan.");
@@ -197,6 +198,7 @@ export default function InventoryPage() {
       if (!res.ok) { alert("Gagal menghapus barang."); return; }
       setDeleteDialogOpen(false);
       setEditingItem(null);
+      setLoading(true);
       fetchItems();
     } catch { alert("Kesalahan jaringan."); } finally { setDeleting(false); }
   };

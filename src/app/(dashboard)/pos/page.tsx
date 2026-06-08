@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose,
 } from "@/components/ui/dialog";
-import { Search, Plus, Trash2, Loader2, Check, ShoppingCart } from "lucide-react";
+import { Trash2, Loader2, Check, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 /* ── types ── */
@@ -89,14 +89,12 @@ export default function POSPage() {
 
   /* ── fetch data ── */
   const fetchInventory = useCallback(async () => {
-    setLoadingInv(true);
     try { setInventory(await (await fetch("/api/inventory")).json()); }
     catch { /* ignore */ }
     finally { setLoadingInv(false); }
   }, []);
 
   const fetchCustomers = useCallback(async () => {
-    setLoadingCust(true);
     try { setCustomers(await (await fetch("/api/customers")).json()); }
     catch { /* ignore */ }
     finally { setLoadingCust(false); }
@@ -107,17 +105,10 @@ export default function POSPage() {
     catch { /* ignore */ }
   }, []);
 
-  useEffect(() => { fetchInventory(); fetchCustomers(); }, [fetchInventory, fetchCustomers]);
-
   useEffect(() => {
-    if (selectedCustomer) {
-      fetchPrescriptions(selectedCustomer.id);
-      setSelectedRx(null);
-    } else {
-      setPrescriptions([]);
-      setSelectedRx(null);
-    }
-  }, [selectedCustomer, fetchPrescriptions]);
+    fetchInventory();
+    fetchCustomers();
+  }, [fetchInventory, fetchCustomers]);
 
   /* ── close dropdowns on outside click ── */
   useEffect(() => {
@@ -230,7 +221,9 @@ export default function POSPage() {
       setPaymentAmount("");
       setSelectedCustomer(null);
       setSelectedRx(null);
+      setPrescriptions([]);
       setCustomerSearch("");
+      setLoadingInv(true);
       fetchInventory(); // refresh stock
     } catch {
       alert("Kesalahan jaringan.");
@@ -268,7 +261,12 @@ export default function POSPage() {
                       <span className="flex-1 font-medium text-sm">{selectedCustomer.name}</span>
                       <button
                         className="text-xs text-muted-foreground hover:text-destructive"
-                        onClick={() => { setSelectedCustomer(null); setCustomerSearch(""); }}
+                        onClick={() => {
+                          setSelectedCustomer(null);
+                          setCustomerSearch("");
+                          setPrescriptions([]);
+                          setSelectedRx(null);
+                        }}
                       >✕</button>
                     </div>
                   ) : (
@@ -291,7 +289,13 @@ export default function POSPage() {
                               <button
                                 key={c.id}
                                 className="w-full text-left px-3 py-2 hover:bg-muted/50 text-sm transition-colors"
-                                onClick={() => { setSelectedCustomer(c); setShowCustDropdown(false); setCustomerSearch(c.name); }}
+                                onClick={() => {
+                                  setSelectedCustomer(c);
+                                  setShowCustDropdown(false);
+                                  setCustomerSearch(c.name);
+                                  setSelectedRx(null);
+                                  fetchPrescriptions(c.id);
+                                }}
                               >
                                 <div className="font-medium">{c.name}</div>
                                 <div className="text-xs text-muted-foreground">{c.phone ?? "—"}</div>

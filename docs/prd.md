@@ -34,7 +34,7 @@ Membangun sistem informasi pengelolaan toko kacamata yang menyederhanakan pencat
 
 | Modul | Deskripsi Kebutuhan |
 | :--- | :--- |
-| **Autentikasi** | Halaman login tunggal tanpa fitur registrasi publik. |
+| **Autentikasi** | Halaman login tunggal dengan Better Auth tanpa fitur registrasi publik. |
 | **Dashboard** | Menampilkan total pendapatan harian dan peringatan stok di bawah 5 item. |
 | **Pelanggan & Resep** | Menyimpan profil pelanggan dan detail resep mata (OD/OS: SPH, CYL, AXIS, ADD, Visus; serta jarak pupil/PD). |
 | **Inventaris** | Menambah, mengedit, menghapus, dan melihat barang (SKU, Nama, Kategori, Harga, Stok). Pengurangan stok terjadi otomatis setelah transaksi. |
@@ -46,14 +46,14 @@ Membangun sistem informasi pengelolaan toko kacamata yang menyederhanakan pencat
 ### F. Persyaratan Non-Fungsional (Non-Functional Requirements)
 *   **UI/UX:** Antarmuka sederhana tanpa submenu kompleks, memanfaatkan navigasi *sidebar* datar.
 *   **Performa:** Waktu respons interaksi halaman dan penyimpanan data di bawah 1 detik.
-*   **Keamanan:** Enkripsi *password* staf di *database* dan *auto-logout* untuk batas waktu sesi *login*.
+*   **Keamanan:** Enkripsi *password* staf di *database* dan *auto-logout* untuk sesi *login* lewat Better Auth.
 
 ---
 
 ### G. Arsitektur Sistem (Client-Server 3-Tier)
-*   **Presentation Tier (Frontend):** Antarmuka web berbasis React untuk mengelola interaksi staf, merender komponen *real-time*, dan melakukan validasi input dasar.
-*   **Application Tier (Backend):** Logika operasional menggunakan Laravel (PHP) untuk autentikasi, kalkulasi transaksi, manajemen *routing*, dan format data laporan.
-*   **Data Tier (Database):** Penyimpanan relasional menggunakan MySQL untuk mengelola entitas *users*, *customers*, *prescriptions*, *inventory_items*, dan *transactions*.
+*   **Presentation Tier (Frontend):** Next.js (React 19) dengan Tailwind CSS dan Shadcn UI untuk interaksi staf yang responsif.
+*   **Application Tier (Backend):** Next.js API Routes (Route Handlers) terintegrasi dengan Better Auth untuk keamanan sesi dan Drizzle ORM untuk transaksi database.
+*   **Data Tier (Database):** Database SQLite lokal (`sqlite.db`) untuk pengelolaan data relational (Users, Customers, Prescriptions, Inventory, Transactions).
 
 ---
 
@@ -63,7 +63,7 @@ Membangun sistem informasi pengelolaan toko kacamata yang menyederhanakan pencat
 | :--- | :--- | :--- | :--- |
 | **Transaksi Harian** | Data pelanggan, resep mata, item pesanan | Menyimpan profil/resep, mencatat transaksi, mengurangi stok otomatis | Struk digital/nota rincian pesanan di layar |
 | **Restock Barang** | SKU, nama, kategori, jumlah barang masuk | Validasi ketersediaan SKU, membuat entri baru atau menambah jumlah stok lama | Pembaruan tabel inventaris dan *dashboard* |
-| **Cetak Laporan** | Parameter bulan dan tahun | Menarik data transaksi selesai, menghitung pendapatan bersih/kotor, menarik mutasi stok | Halaman HTML siap cetak untuk diserahkan ke pemilik |
+| **Cetak Laporan** | Parameter bulan dan tahun | Menarik data transaksi selesai, menghitung pendapatan bersih/kotor | Halaman HTML siap cetak untuk diserahkan ke pemilik |
 
 ---
 
@@ -77,5 +77,5 @@ Membangun sistem informasi pengelolaan toko kacamata yang menyederhanakan pencat
 
 ### J. Batasan Teknis (Technical Constraints)
 *   **Lingkungan Eksekusi:** Harus berjalan mulus di *browser* standar (Chrome, Edge, Firefox) yang memiliki fitur dialog cetak bawaan yang stabil.
-*   **Deployment:** Infrastruktur aplikasi harus mendukung penerapan secara lokal (*localhost*) di komputer toko atau via *shared hosting* berkapasitas standar.
+*   **Deployment:** Infrastruktur aplikasi harus mendukung penerapan secara lokal (*localhost*) di komputer toko atau via deployment hosting (Vercel) dengan integrasi database.
 *   **Single-Tenancy:** Sistem berjalan murni tanpa sistem manajemen peran (Role-Based Access Control) yang kompleks.

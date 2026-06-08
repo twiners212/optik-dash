@@ -55,6 +55,26 @@ export default function LoginPage() {
     );
   };
 
+  const handleDemoLogin = async () => {
+    setError("");
+    setLoading(true);
+    setEmail("demo@optidash.com");
+    setPassword("password123");
+
+    await signIn.email(
+      { email: "demo@optidash.com", password: "password123" },
+      {
+        onSuccess: () => {
+          router.push("/dashboard");
+        },
+        onError: (ctx) => {
+          setError(ctx.error.message || "Login Demo gagal. Hubungi admin.");
+          setLoading(false);
+        },
+      }
+    );
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md shadow-lg border-primary/20">
@@ -111,6 +131,19 @@ export default function LoginPage() {
             <Button type="submit" className="w-full font-semibold" size="lg" disabled={loading}>
               {loading ? "Memproses..." : isRegistering ? "Daftar" : "Masuk"}
             </Button>
+
+            {!isRegistering && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full font-semibold border-primary/40 text-primary hover:bg-primary/5"
+                size="lg"
+                disabled={loading}
+                onClick={handleDemoLogin}
+              >
+                Masuk sebagai Demo Akun
+              </Button>
+            )}
 
             <Button
               type="button"

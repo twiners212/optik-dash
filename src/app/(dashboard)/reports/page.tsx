@@ -21,10 +21,6 @@ interface Transaction {
   customerName: string | null;
 }
 
-interface DashboardData {
-  today: { totalRevenue: number; transactionCount: number };
-  monthly: { totalRevenue: number; totalDiscount: number; transactionCount: number } | null;
-}
 
 const MONTHS = [
   { value: "01", label: "Januari" },
@@ -58,18 +54,12 @@ export default function ReportsPage() {
   const [month, setMonth] = useState(String(now.getMonth() + 1).padStart(2, "0"));
   const [year, setYear] = useState(String(now.getFullYear()));
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [summary, setSummary] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
     try {
-      const [txRes, dashRes] = await Promise.all([
-        fetch(`/api/transactions?month=${month}&year=${year}`),
-        fetch(`/api/dashboard?month=${month}&year=${year}`),
-      ]);
-      setTransactions(await txRes.json());
-      setSummary(await dashRes.json());
+      const res = await fetch(`/api/transactions?month=${month}&year=${year}`);
+      setTransactions(await res.json());
     } catch {
       /* ignore */
     } finally {
@@ -77,7 +67,9 @@ export default function ReportsPage() {
     }
   }, [month, year]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   /* ── derived stats ── */
   const totalRevenue = transactions.reduce((s, t) => s + t.total, 0);
@@ -100,7 +92,7 @@ export default function ReportsPage() {
           <p className="text-muted-foreground">Pilih periode untuk melihat dan mencetak laporan.</p>
         </div>
         <div className="flex gap-3">
-          <Select value={month} onValueChange={(val) => setMonth(val ?? "")}>
+          <Select value={month} onValueChange={(val) => { setMonth(val ?? ""); setLoading(true); }}>
             <SelectTrigger className="w-[130px]">
               <SelectValue placeholder="Bulan" />
             </SelectTrigger>
@@ -110,7 +102,7 @@ export default function ReportsPage() {
               ))}
             </SelectContent>
           </Select>
-          <Select value={year} onValueChange={(val) => setYear(val ?? "")}>
+          <Select value={year} onValueChange={(val) => { setYear(val ?? ""); setLoading(true); }}>
             <SelectTrigger className="w-[100px]">
               <SelectValue placeholder="Tahun" />
             </SelectTrigger>
