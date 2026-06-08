@@ -13,6 +13,7 @@ Dokumen ini memuat rangkuman status pengerjaan proyek OptiDash, riwayat perbaika
 | **M3: Modul Inventaris & POS** | Halaman CRUD Stok Barang dan antarmuka transaksi Kasir (POS) beserta pengaliran stok. | ✅ Selesai |
 | **M4: Modul Laporan Penjualan** | Pembuatan Laporan Bulanan & Cetak Dokumen (Media Print CSS). | ✅ Selesai |
 | **M5: Pembersihan & Audit** | Pembenahan linter, perbaikan `.gitignore`, penghapusan cache build, integrasi `.env.example`. | ✅ Selesai |
+| **M6: Live Deployment** | Penerapan deployment production ke Vercel terintegrasi GitHub. | ✅ Selesai |
 
 ---
 
@@ -37,8 +38,27 @@ Telah dilakukan audit dan tindakan perbaikan langsung terhadap performa aplikasi
 
 ---
 
+## 🚨 Analisis Runtime & Rekomendasi Cloud Database (Vercel Deployment)
+
+### 1. Masalah Runtime SQLite di Serverless
+*   **Temuan**: Proses build dan kompilasi di server Vercel berhasil 100%. Namun, saat pengujian runtime (seperti pendaftaran akun staf/login), server mengembalikan status **Runtime Error 500**.
+*   **Penyebab**: Vercel Serverless Function menggunakan sistem file ephemeral dan read-only. Database SQLite lokal (`sqlite.db`) sengaja diabaikan oleh `.gitignore` (praktik terbaik), dan sistem Vercel menolak pembuatan database baru berformat file di sistem file serverless miliknya.
+
+### 2. Rekomendasi Migrasi Cloud Database
+Untuk live portfolio yang berfungsi penuh di internet, proyek direkomendasikan bermigrasi ke database eksternal:
+*   **Opsi A: Turso (SQLite Cloud/LibSQL)**
+    *   *Mengapa*: Sangat kompatibel dengan skema Drizzle SQLite saat ini. Ringan, responsif, dan gratis.
+    *   *Langkah*: Gunakan `@libsql/client` untuk menggantikan `better-sqlite3` dan hubungkan koneksi database ke endpoint Turso menggunakan environment variables (`DATABASE_URL` & `DATABASE_AUTH_TOKEN`).
+*   **Opsi B: Vercel Postgres / Neon**
+    *   *Mengapa*: Didukung langsung secara native oleh infrastruktur serverless Vercel.
+    *   *Langkah*: Ubah skema Drizzle di [schema.ts](file:///c:/Users/radit/.gemini/antigravity/scratch/optik-66/src/lib/schema.ts) menyesuaikan dialek PostgreSQL.
+
+---
+
 ## 🚦 Status Sistem Saat Ini
 
 *   **Runtime Status**: ✅ Berjalan normal di mode pengembangan (`npm run dev`).
 *   **Build Status**: ✅ Berhasil dibangun untuk produksi (`npm run build`) tanpa warning atau error.
 *   **Linter Status**: ✅ Bersih (0 Error, 0 Warning).
+*   **Live Deployment**: ✅ Live at [https://optik-dash.vercel.app](https://optik-dash.vercel.app) (Vercel).
+*   **GitHub Repository**: ✅ [https://github.com/twiners212/optik-dash](https://github.com/twiners212/optik-dash) (Branch `main`).
